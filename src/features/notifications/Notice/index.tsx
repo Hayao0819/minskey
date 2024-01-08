@@ -1,38 +1,82 @@
-import { Notification } from "misskey-js/built/entities"
+import { Notification, User } from "misskey-js/built/entities"
+
+import Link from "next/link"
+import { ReactNode } from "react"
+import NoticeNotePreview from "./NoticeNotePreview"
+
+import TLUserIcon from "~/features/profile/TLUserIcon"
+import { profileLink } from "~/features/profile"
 
 export default function Notice({ notice }: { notice: Notification }) {
-  switch (notice.type) {
-    case "follow":
-      return <FollowNotice notice={notice} />
-    case "mention":
-      return <MentionNotice notice={notice} />
+  return (
+    <div className="p-3 border-t flex justify-between">
+      <NoticeContent notice={notice} />
+      <span>{notice.id}</span>
+    </div>
+  )
+}
 
-    case "reply":
-      return <ReplyNotice notice={notice} />
-    case "renote":
-      return <RenoteNotice notice={notice} />
-    case "quote":
-      return <QuoteNotice notice={notice} />
-    case "reaction":
-      return <ReactionNotice notice={notice} />
-    case "pollVote":
-      return <PollVoteNotice notice={notice} />
-    case "receiveFollowRequest":
-      return <ReceiveFollowRequestNotice notice={notice} />
-    case "followRequestAccepted":
-      return <FollowRequestAcceptedNotice notice={notice} />
-    case "groupInvited":
-      return <GroupInvitedNotice notice={notice} />
-    case "app":
-      return <AppNotice notice={notice} />
-    default:
-      return <UnknownNotice notice={notice} />
-  }
+export const NoticeUser = ({ user, children }: { user: User; children?: ReactNode }) => {
+  return (
+    <div className="flex gap-1.5">
+      <TLUserIcon user={user} />
+      <div className="flex w-full flex-col gap-0.5">
+        <div className="flex justify-between">
+          <div className="flex gap-1 font-bold">
+            <Link className="hover:underline" href={profileLink(user)}>
+              {user.name}
+            </Link>
+            <p>
+              <span>@{user.username}</span>
+              <span className="text-neutral-400">@{user.host}</span>
+            </p>
+          </div>
+        </div>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+const NoticeContent = ({ notice }: { notice: Notification }) => {
+  return (
+    <>
+      {notice.type === "follow" ? (
+        <FollowNotice notice={notice} />
+      ) : notice.type === "mention" ? (
+        <MentionNotice notice={notice} />
+      ) : notice.type === "reply" ? (
+        <ReplyNotice notice={notice} />
+      ) : notice.type === "renote" ? (
+        <RenoteNotice notice={notice} />
+      ) : notice.type === "quote" ? (
+        <QuoteNotice notice={notice} />
+      ) : notice.type === "reaction" ? (
+        <ReactionNotice notice={notice} />
+      ) : notice.type === "pollVote" ? (
+        <PollVoteNotice notice={notice} />
+      ) : notice.type === "receiveFollowRequest" ? (
+        <ReceiveFollowRequestNotice notice={notice} />
+      ) : notice.type === "followRequestAccepted" ? (
+        <FollowRequestAcceptedNotice notice={notice} />
+      ) : notice.type === "groupInvited" ? (
+        <GroupInvitedNotice notice={notice} />
+      ) : notice.type === "app" ? (
+        <AppNotice notice={notice} />
+      ) : (
+        <UnknownNotice notice={notice} />
+      )}
+    </>
+  )
 }
 
 export function FollowNotice({ notice }: { notice: Notification }) {
   if (notice.type !== "follow") return null
-  return <div>{notice.user.name}さんがフォローしました</div>
+  return (
+    <div>
+      <NoticeUser user={notice.user}>あなたをフォローしました</NoticeUser>
+    </div>
+  )
 }
 
 export function MentionNotice({ notice }: { notice: Notification }) {
@@ -41,7 +85,12 @@ export function MentionNotice({ notice }: { notice: Notification }) {
 }
 export function ReplyNotice({ notice }: { notice: Notification }) {
   if (notice.type !== "reply") return null
-  return <div>{notice.user.name}さんから返信が届きました</div>
+  return (
+    <div>
+      <span>{notice.user.name}さんから返信が届きました</span>
+      <NoticeNotePreview note={notice.note} />
+    </div>
+  )
 }
 
 export function RenoteNotice({ notice }: { notice: Notification }) {

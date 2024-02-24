@@ -1,3 +1,4 @@
+import PictureDialog from "~/features/note/PictureDialog"
 import NoteDialog from "~/features/note/NoteDialog"
 import PictureDialog from "~/features/note/PictureDialog"
 import Nav from "./Nav"

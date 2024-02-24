@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
 import { useClient } from "~/features/common"
+import { useAPI } from "../api"
+import { useUserCache } from "../usercache"
 
 type ArrElement<ArrType> = ArrType extends readonly (infer ElementType)[] ? ElementType : never
 
@@ -17,8 +19,10 @@ type Account = {
   token: string
 }
 
-// FixMe: 理論上、currentAccountAtomにaccountsAtomに存在しない値を代入することができる
+// ログインしているアカウントの一覧
 export const accountsAtom = atomWithStorage<Account[] | null>("minsk::accounts", null)
+
+// 現在のアカウントのindex
 export const currentAccountIndexAtom = atomWithStorage<number | null>("minsk::accounts::currentAccount", null)
 
 type AuthSession = {
@@ -40,6 +44,8 @@ export function useAuth() {
   const [authSession, setAuthSession] = useAtom(authSessionAtom)
   const [authError, setAuthError] = useAtom(authErrorAtom)
   const { accounts, removeAccount } = useAccounts()
+  const api = useAPI()
+  const { addUserCache } = useUserCache()
 
   const setAuth = ({
     account,
@@ -50,9 +56,14 @@ export function useAuth() {
     session?: typeof authSession
     error?: typeof authError
   }) => {
+    // 各値を更新
     if (account !== undefined) setCurrentAccount(account)
     if (session !== undefined) setAuthSession(session)
     if (error !== undefined) setAuthError(error)
+
+    api?.request("i").then(res => {
+      addUserCache(res)
+    })
   }
 
   const logout = () => {
@@ -86,7 +97,7 @@ export function useAccounts(login?: boolean) {
   const client = useClient()
 
   useEffect(() => {
-    //if (login && client && !accounts) router.push("/")
+    if (login && client && !accounts) router.push("/")
   }, [login, client, accounts, router])
 
   const addAccount = (account: ArrElement<NonNullable<typeof accounts>>) => {
@@ -96,8 +107,6 @@ export function useAccounts(login?: boolean) {
 
   const removeAccount = (index: number) => {
     if (accounts) {
-      // 完全一致するアカウントを削除
-      // JSON比較するのだめかもしれない
       const newAccounts = accounts.filter((_, i) => i !== index)
       setAccounts(newAccounts)
     }
@@ -116,7 +125,6 @@ export const useLogin = (login?: boolean) => {
   const accounts = useAtomValue(accountsAtom)
   const client = useClient()
   const router = useRouter()
-  console.log("uselogin")
   useEffect(() => {
     if (login && client && (!accounts || currentAccount == null)) router.push("/")
   }, [login, client, currentAccount, router, accounts])

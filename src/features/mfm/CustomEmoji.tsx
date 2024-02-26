@@ -1,37 +1,14 @@
 "use client"
 
-import { atom, useAtom, useAtomValue } from "jotai"
-import { Suspense, createContext, use, useContext } from "react"
+import { Suspense, createContext, useContext } from "react"
 import { CustomEmojiProps } from "react-mfm"
-import { fetchEmojiUrl } from "~/features/api"
+import { EmojiImg, FetchEmoji, useEmojiCache } from "../api/emoji"
 
 export const CustomEmojiCtx = createContext<{ host: string | null }>({ host: null })
 
-const cacheAtom = atom<{ [host: string]: { [name: string]: string | null } }>({})
-
-const EmojiImg = ({ name, url }: { name: string; url?: string }) =>
-  !url ? `:${name}:` : <img src={url} alt={name} className="mfm-customEmoji" />
-
-function FetchEmoji({ name, host }: { name: string; host: string }) {
-  const [cache, setCache] = useAtom(cacheAtom)
-  //console.log(cache)
-  if (host in cache && name in cache[host]) {
-    const url = cache[host][name]
-
-    if (!url) return <EmojiImg name={name} /> // 虚無がキャッシュされたときの処理
-    return <EmojiImg name={name} url={url} />
-  }
-
-  const url = use(fetchEmojiUrl(name, host))
-  setCache({
-    ...cache,
-    [host]: { ...cache[host], [name]: url },
-  })
-  return <EmojiImg name={name} url={url ?? undefined} />
-}
-
 export default function CustomEmoji({ name }: CustomEmojiProps) {
-  const cache = useAtomValue(cacheAtom)
+  const { cache } = useEmojiCache()
+
   const { host } = useContext(CustomEmojiCtx)
   if (!host) return <EmojiImg name={name} />
   return (

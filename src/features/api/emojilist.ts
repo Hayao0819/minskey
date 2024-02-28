@@ -1,8 +1,6 @@
 import { atom, useAtomValue } from "jotai"
-import { apiAtom } from "."
+import { misskeyJSAtom } from "."
 import { authSessionAtom } from "../auth"
-
-
 
 // Misskey v12系と現行の両方に対応した絵文字の型
 export interface CustomEmoji {
@@ -31,7 +29,7 @@ export async function fetchLocalEmojiList(host: string): Promise<EmojiListRespon
 const localEmojiListAtom = atom(async get => {
   const emojiList: CustomEmoji[] = []
 
-  const api = get(apiAtom)
+  const api = get(misskeyJSAtom)
   const auth = get(authSessionAtom)
 
   if (!api || !auth) return []

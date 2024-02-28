@@ -2,10 +2,9 @@
 
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useEffect, useState } from "react"
-
+import NBSK from "~/components/NBSK"
 import { useAccounts, useAuth } from "~/features/auth"
 import { useClient } from "~/features/common"
-import NBSK from "~/features/common/NBSK"
 
 export default function AuthPage() {
   return (
@@ -38,8 +37,7 @@ function AuthSuspense() {
         const url = `${proto}://${host}/api/miauth/${id}/check`
         const res = await fetch(url, { method: "POST" }).then(r => r.json())
         if (!res.ok) throw new Error("miauth failed")
-        const account = { proto, host, token: res.token }
-        addAccount(account)
+        addAccount({ proto, host, token: res.token })
         setAuth({
           account: accounts?.length ?? 0,
           session: null,
@@ -49,7 +47,9 @@ function AuthSuspense() {
       } catch (e) {
         const host = session?.host ? `${session?.proto}://${session?.host}` : null
         setAuth({ session: null, error: e + "" })
-        router.replace(`/login?go=${encodeURIComponent(go)}` + (host ? `&host=${encodeURIComponent(host)}` : ""))
+        router.replace(
+          `/login?go=${encodeURIComponent(go)}` + (host ? `&host=${encodeURIComponent(host)}` : ""),
+        )
       } finally {
         setDone(true)
       }

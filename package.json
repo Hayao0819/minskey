@@ -16,6 +16,8 @@
     "lucide-react": "0.341.0",
     "mfm-js": "0.24.0",
     "misskey-js": "0.0.16",
+    "misskey-js-12": "npm:misskey-js@0.0.16",
+    "misskey-js-latest": "npm:misskey-js@^2024.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "7.50.1",

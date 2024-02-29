@@ -1,3 +1,5 @@
+import { Endpoints } from "./type"
+
 export default class BaseClient {
   host: string
   token?: string
@@ -7,8 +9,10 @@ export default class BaseClient {
     this.token = token
   }
 
-  get(path: string, opts?: RequestInit) {
-    return fetch(this.host + "/api/" + path, opts).then(res => res.json())
+  get(path: keyof Endpoints, opts?: Endpoints[typeof path]) {
+    return fetch(this.host + "/api/" + path + new URLSearchParams(opts["req"]).toString()).then(
+      res => res.json(),
+    )
   }
 
   post(path: string, opts?: RequestInit, body?: Object) {

@@ -5,7 +5,7 @@
 
 (消極的な理由によって)最小限の機能のみを実装したMisskeyクライアントです。
 
-Next.jsのStatic Exportによってビルドされ、状態はすべてローカルに保存されるようになっています。
+Next.jsのStatic Exportsによってビルドされ、状態はすべてローカルに保存されるようになっています。
 
 **Minskeyは現在開発中です。開発ステータスは[こちら](https://github.com/yamader/minskey/issues/4)を参照してください。**
 
@@ -13,16 +13,19 @@ Next.jsのStatic Exportによってビルドされ、状態はすべてローカ
 
 安定版は[minskey.dyama.net](https://minskey.dyama.net/)で公開されています。
 
-なんとなく使い方はわかると思います。
+使い方はなんとなくでわかると思います。
 
 ## 開発
 
-Node.js開発環境とPnpm実行環境を構築してください。Minskeyでは[Volta](https://volta.sh/)を推奨しています。
+Node.js開発環境とPNpm実行環境を構築してください。Minskeyでは[Volta](https://volta.sh/)と[Corepack](https://nodejs.org/api/corepack.html)を推奨しています。
+
+指定されている[Node.js](./.node-version)と[PNpm](./package.json)を使っていれば最悪なんでも良いです。
 
 ```bash
 volta setup
-volta node@lts
-volta install pnpm
+volta install node@lts corepack
+corepack enable pnpm
+corepack install
 pnpm install
 ```
 

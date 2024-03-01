@@ -1,4 +1,4 @@
-export default class BaseClient {
+export default abstract class BaseClient {
   host: string
   token?: string
 
@@ -11,6 +11,7 @@ export default class BaseClient {
     return fetch(this.host + "/api/" + path, opts).then(res => res.json())
   }
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   post(path: string, opts?: RequestInit, body?: Object) {
     return fetch(this.host + "/api/" + path, {
       method: "POST",
@@ -19,4 +20,6 @@ export default class BaseClient {
       ...opts,
     }).then(res => res.json())
   }
+
+  abstract fetchEmojiUrl(name: string): Promise<string | null>
 }

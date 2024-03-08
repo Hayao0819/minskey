@@ -6,7 +6,7 @@ import NBSK from "~/components/NBSK"
 import { UserDetail } from "~/features/api/clients/entities"
 import { useAuth } from "~/features/auth"
 import { useClient, useMutex } from "~/features/common"
-import { useLogginedCache } from "~/features/user"
+import { useUserCache } from "~/features/user"
 import { dbg } from "~/utils"
 
 export default function AuthPage() {
@@ -22,7 +22,7 @@ function AuthSuspense() {
   const searchParams = useSearchParams()
   const { session, addMultiAccount, setAuth } = useAuth()
   const client = useClient()
-  const { addLoggined } = useLogginedCache()
+  const { updateUserCache } = useUserCache()
   const [once, setOnce] = useState(false) // 💩
 
   useMutex(async () => {
@@ -47,7 +47,7 @@ function AuthSuspense() {
       if (!res.user.id) {
         // todo: re-fetch
       }
-      addLoggined(res.user)
+      updateUserCache(res.user)
 
       dbg("auth success", res.user?.id, res.token)
 

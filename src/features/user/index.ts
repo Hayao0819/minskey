@@ -2,20 +2,30 @@ import { useAtom } from "jotai"
 import { atomWithStorage } from "jotai/utils"
 import { User } from "~/features/api/clients/entities"
 
-const logginedCacheAtom = atomWithStorage<{ [id: string]: User }>("minsk::auth::loggined", {})
+interface UserCache {
+  [host: string]: {
+    [username: string]: User
+  }
+}
 
-export const useLogginedCache = () => {
-  const [logginedCache, setlogginedCache] = useAtom(logginedCacheAtom)
+const userCacheAtom = atomWithStorage<UserCache>("minsk::user::cache", {})
 
-  const addLoggined = (user: User) => {
-    setlogginedCache({
-      ...logginedCache,
-      [user.id]: user,
+export const useUserCache = () => {
+  const [userCache, setUserCache] = useAtom(userCacheAtom)
+
+  const updateUserCache = (user: User) => {
+    if (!user.host) return
+    setUserCache({
+      ...userCache,
+      [user.host]: {
+        ...userCache[user.host],
+        [user.username]: user,
+      },
     })
   }
 
   return {
-    logginedCache,
-    addLoggined,
+    userCache,
+    updateUserCache,
   }
 }

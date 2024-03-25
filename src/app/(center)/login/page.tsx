@@ -1,13 +1,14 @@
 "use client"
 
 import * as RadioGroup from "@radix-ui/react-radio-group"
-import { permissions } from "misskey-js"
+import { MiAuth } from "miauth-js"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { v4 as uuidv4 } from "uuid"
 import { detect } from "~/features/api/clients"
 import { useAuth } from "~/features/auth"
+import { AllScope } from "~/features/auth/scope"
 import { ensureproto } from "~/utils"
 
 export default function LoginPage() {
@@ -108,11 +109,7 @@ function MiAuthLogin({ go, host }: LoginProps) {
 
   const onSubmit = async ({ host }: MiAuthForm) => {
     const realHost = ensureproto(host),
-      sid = uuidv4(),
-      name = "minskey",
-      icon = location?.origin + "/favicon.png",
-      callback = location?.origin + `/auth?go=${go}`,
-      permission = permissions.join(",")
+      sid = uuidv4()
 
     const client = await detect(realHost)
     if (!client) {
@@ -120,8 +117,19 @@ function MiAuthLogin({ go, host }: LoginProps) {
       return
     }
 
+    const miauth = new MiAuth(
+      realHost,
+      {
+        name: "minskey",
+        //icon: location?.origin + "/favicon.png",
+        callback: location?.origin + `/auth?go=${go}`,
+        permission: AllScope,
+      },
+      sid,
+    )
+
     try {
-      const url = `${realHost}/miauth/${sid}?name=${name}&icon=${icon}&callback=${callback}&permission=${permission}`
+      const url = miauth.authUrl()
       setAuth({ session: { sid, host: realHost } })
       router.push(url)
     } catch (e) {

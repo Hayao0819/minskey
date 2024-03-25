@@ -16,6 +16,7 @@
     "jotai": "2.7.1",
     "lucide-react": "0.358.0",
     "mfm-js": "0.24.0",
+    "miauth-js": "^0.0.6",
     "misskey-js": "0.0.16",
     "react": "18.2.0",
     "react-dom": "18.2.0",
